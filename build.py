@@ -12,6 +12,22 @@ HEADER = """//!
 //!
 
 extern crate webpki;
+extern crate time;
+
+// See:
+// https://blog.mozilla.org/security/2016/10/24/distrusting-new-wosign-and-startcom-certificates/
+// https://wiki.mozilla.org/CA:WoSign_Issues
+static OCTOBER_21_2016: i64 = 1477008000;
+
+fn wosign_startcom_policy(_der: &[u8], _subj: &[u8], _spki: &[u8],
+                          not_before: time::Timespec,
+                          _not_after: time::Timespec) -> Result<(), webpki::Error> {
+  if not_before.sec > OCTOBER_21_2016 {
+    Err(webpki::Error::RejectedByPolicy)
+  } else {
+    Ok(())
+  }
+}
 """
 
 CERT = """
@@ -24,15 +40,16 @@ excluded_cas = [
     "China Internet Network Information Center",
     "CNNIC",
 
-    # See https://wiki.mozilla.org/CA:WoSign_Issues.
-    "StartCom",
-    "WoSign",
-
     # See https://cabforum.org/pipermail/public/2016-September/008475.html.
     # Both the ASCII and non-ASCII names are required.
     "TÜRKTRUST",
     "TURKTRUST",
 ]
+
+restricted_cas = {
+    'StartCom': 'wosign_startcom_policy',
+    'WoSign': 'wosign_startcom_policy',
+}
 
 def fetch_bundle():
     proc = subprocess.Popen(['curl',
@@ -108,12 +125,20 @@ def convert_bytes(hex):
     bb = hex.decode('hex')
     return bb.encode('string_escape').replace('"', '\\"')
 
+def resolve_policy(subject_hex):
+    subject = subject_hex.decode('hex')
+    for subject_substr, policy_fn in restricted_cas.items():
+        if subject_substr in subject:
+            return 'Some(%s)' % policy_fn
+    return 'None'
+
 def print_root(cert, data):
     subject = convert_bytes(data['subject'])
     spki = convert_bytes(data['spki'])
     nc = data['name_constraints']
     nc = ('Some(b"%s")' % convert_bytes(nc)) if nc != 'None' else nc
     not_after = long(data['not_after'])
+    policy = resolve_policy(data['subject'])
 
     print """  %s
   webpki::TrustAnchor {
@@ -121,8 +146,9 @@ def print_root(cert, data):
     spki: b"%s",
     name_constraints: %s,
     not_after: %d,
+    policy: %s
   },
-""" % (commentify(cert), subject, spki, nc, not_after)
+""" % (commentify(cert), subject, spki, nc, not_after, policy)
 
 if __name__ == '__main__':
     if sys.platform == "win32":
