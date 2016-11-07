@@ -27,4 +27,5 @@ fn main() {
   } else {
     dumphex("Name-Constraints", ta.name_constraints.unwrap());
   }
+  println!("Not-After: {}", ta.not_after);
 }

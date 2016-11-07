@@ -96,7 +96,8 @@ def convert_cert(cert_der):
     return dict(
             subject = extract(stdout, 'Subject'),
             spki = extract(stdout, 'SPKI'),
-            name_constraints = extract(stdout, 'Name-Constraints'))
+            name_constraints = extract(stdout, 'Name-Constraints'),
+            not_after = extract(stdout, 'Not-After'))
 
 def commentify(cert):
     lines = cert.splitlines()
@@ -112,14 +113,16 @@ def print_root(cert, data):
     spki = convert_bytes(data['spki'])
     nc = data['name_constraints']
     nc = ('Some(b"%s")' % convert_bytes(nc)) if nc != 'None' else nc
+    not_after = long(data['not_after'])
 
     print """  %s
   webpki::TrustAnchor {
     subject: b"%s",
     spki: b"%s",
-    name_constraints: %s
+    name_constraints: %s,
+    not_after: %d,
   },
-""" % (commentify(cert), subject, spki, nc)
+""" % (commentify(cert), subject, spki, nc, not_after)
 
 if __name__ == '__main__':
     if sys.platform == "win32":
