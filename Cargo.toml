@@ -10,4 +10,4 @@ repository = "https://github.com/ctz/webpki-roots"
 
 [dependencies]
 untrusted = "0.3"
-webpki = "0.3.0"
+webpki = { git = "https://github.com/ctz/webpki", branch = "jbp-pss" }
