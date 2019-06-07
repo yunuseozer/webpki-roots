@@ -10,4 +10,9 @@ homepage = "https://github.com/ctz/webpki-roots"
 repository = "https://github.com/ctz/webpki-roots"
 
 [dependencies]
-webpki = "0.21.0"
+webpki = { git = "https://github.com/mesalock-linux/webpki", branch = "mesalock_sgx" }
+sgx_tstd = { rev = "v1.0.8", git = "https://github.com/baidu/rust-sgx-sdk.git", optional = true }
+
+[features]
+default = ["mesalock_sgx"]
+mesalock_sgx = ["sgx_tstd"]
