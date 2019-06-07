@@ -14,6 +14,15 @@
         unused_extern_crates,
         unused_qualifications)]
 
+#![cfg_attr(all(target_env = "sgx", target_vendor = "mesalock"), allow(unstable_features))]
+#![cfg_attr(all(feature = "mesalock_sgx", not(target_env = "sgx")), no_std)]
+#![cfg_attr(all(target_env = "sgx", target_vendor = "mesalock"), feature(rustc_private))]
+#[cfg(all(feature = "mesalock_sgx", not(target_env = "sgx")))]
+extern crate sgx_tstd as std;
+
+#[cfg(feature = "mesalock_sgx")]
+use std::prelude::v1::*;
+
 pub static TLS_SERVER_ROOTS: webpki::TLSServerTrustAnchors = webpki::TLSServerTrustAnchors(&[
   /*
    * Issuer: CN=Entrust Root Certification Authority - EC1 O=Entrust, Inc. OU=See www.entrust.net/legal-terms/(c) 2012 Entrust, Inc. - for authorized use only
