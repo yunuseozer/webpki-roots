@@ -14,7 +14,6 @@
         unused_extern_crates,
         unused_qualifications)]
 
-#![cfg_attr(all(target_env = "sgx", target_vendor = "mesalock"), allow(unstable_features))]
 #![cfg_attr(all(feature = "mesalock_sgx", not(target_env = "sgx")), no_std)]
 #![cfg_attr(all(target_env = "sgx", target_vendor = "mesalock"), feature(rustc_private))]
 #[cfg(all(feature = "mesalock_sgx", not(target_env = "sgx")))]
