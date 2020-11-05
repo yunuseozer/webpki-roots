@@ -6,8 +6,7 @@
 //! yourself by inspecting and re-running the generation process.
 //!
 
-#![forbid(unsafe_code,
-          unstable_features)]
+#![forbid(unsafe_code)]
 #![deny(trivial_casts,
         trivial_numeric_casts,
         unused_import_braces,
