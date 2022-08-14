@@ -14,7 +14,7 @@
         unused_extern_crates,
         unused_qualifications)]
 
-pub static TLS_SERVER_ROOTS: webpki::TlsServerTrustAnchors = webpki::TlsServerTrustAnchors(&[
+pub static TLS_SERVER_ROOTS: webpki::TLSServerTrustAnchors = webpki::TLSServerTrustAnchors(&[
   /*
    * Issuer: CN=DigiCert TLS ECC P384 Root G5 O=DigiCert, Inc.
    * Subject: CN=DigiCert TLS ECC P384 Root G5 O=DigiCert, Inc.
